@@ -1,0 +1,4 @@
+LAG
+===
+
+Logical Argument Generator
