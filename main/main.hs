@@ -33,7 +33,7 @@ getOperators =
 		 operators <- getLine
 		 return (map digitToInt operators)
 -------------------------------------------------------------------------------------------------------------end of IO
-getConclusion :: [Int] -> Maybe String
+{-getConclusion :: [Int] -> Maybe String
 
 makePremise :: String -> [Int] -> Int -> (Int,Int) -> String
 
@@ -42,6 +42,9 @@ makeArgument :: [Int] -> (Int,Int) -> (Int,Int) -> String
 makeArgument operators premRange atomRange=
 	let conclusion = getConclusion operators atomRange
 	makePremises conclusion operators (randomRIO premRange) atomRange
+	-}
+
+
 
 
 
@@ -51,7 +54,7 @@ makeArgument operators premRange atomRange=
 main :: IO()
 main =
     do   
-	putStrLn "Welcome to Random Argument Generator"
+	putStrLn "Welcome to Logical Argument Generator"
 	arguments <- getArguments
 	validity <- getValidity
 	putStrLn "Enter the range of the number of premises to each argument"
