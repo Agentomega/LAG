@@ -33,26 +33,32 @@ getOperators =
          operators <- getLine
          return (map digitToInt operators)
 -------------------------------------------------------------------------------------------------------------end of IO
+convertAtoms :: Int -> String
+convertAtoms atomNum = 
+    take atomNum ['A'..'Z']
+
+
 convertOperators :: Int -> String
 convertOperators 1 = "∧"
 convertOperators 2 = "∨"
 convertOperators 3 = "→"
 
-getConclusion :: [Int] -> Int -> String
+getConclusion :: [String] -> String -> String
 getConclusion operators atomNum = undefined
 
 
-makePremise :: String -> [Int] -> Int -> Int -> IO String
+makePremise :: String -> [String] -> Int -> String -> IO String
 makePremise = undefined
 
 
-makeArgument :: [Int] -> (Int,Int) -> (Int,Int) -> IO String
+makeArgument :: [String] -> (Int,Int) -> (Int,Int) -> IO String
 makeArgument operators premRange atomRange =
    do
     premNum <- randomRIO premRange
     atomNum <- randomRIO atomRange
-    let conclusion = getConclusion operators atomNum
-    makePremise conclusion operators premNum atomNum
+    let atoms = convertAtoms atomNum
+    let conclusion = getConclusion operators atoms
+    makePremise conclusion operators premNum atoms
 
 
 
@@ -69,6 +75,5 @@ main =
     atomRange <- getRange
     dummyOperators <- getOperators
     let operators = map convertOperators dummyOperators
-    print operators
     putStrLn "Thank You!\nExecuting..."
     putStrLn "Good Bye"
