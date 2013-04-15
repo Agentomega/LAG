@@ -33,8 +33,13 @@ getOperators =
          operators <- getLine
          return (map digitToInt operators)
 -------------------------------------------------------------------------------------------------------------end of IO
+convertOperators :: Int -> String
+convertOperators 1 = "∧"
+convertOperators 2 = "∨"
+convertOperators 3 = "→"
+
 getConclusion :: [Int] -> Int -> String
-getConclusion = undefined
+getConclusion operators atomNum = undefined
 
 
 makePremise :: String -> [Int] -> Int -> Int -> IO String
@@ -62,6 +67,8 @@ main =
     premRange <- getRange
     putStrLn "Enter the range of the number of atomic statments per premises"
     atomRange <- getRange
-    operators <- getOperators
+    dummyOperators <- getOperators
+    let operators = map convertOperators dummyOperators
+    print operators
     putStrLn "Thank You!\nExecuting..."
     putStrLn "Good Bye"
