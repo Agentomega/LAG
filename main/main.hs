@@ -2,7 +2,7 @@
 import System.Random(randomRIO)
 import Data.Char (digitToInt)
 
-----------------------------------------------------------------------------------------------------start of IO functions
+----------------------------------------------------------------------------------------------------prompting user
 getArguments :: IO Int
 getArguments =
     do putStrLn "Enter the number of arguments you want to have"
@@ -32,7 +32,9 @@ getOperators =
          putStrLn "Enter the operators you want\n(1) for (∧)\n(2) for (∨)\n(3) for (→)\n no spaces or commas\n"
          operators <- getLine
          return (map digitToInt operators)
--------------------------------------------------------------------------------------------------------------end of IO
+-------------------------------------------------------------------------------------------------------------end of prompting user
+
+-------------------------------------------------------------------------------------------------------------changing representations
 convertAtoms :: Int -> String
 convertAtoms atomNum = 
     take atomNum ['A'..'Z']
@@ -42,6 +44,9 @@ convertOperators :: Int -> String
 convertOperators 1 = "∧"
 convertOperators 2 = "∨"
 convertOperators 3 = "→"
+--------------------------------------------------------------------------------------------------------------end of changing representations
+
+--------------------------------------------------------------------------------------------------------------start of making argument
 
 getConclusion :: [String] -> String -> String
 getConclusion operators atomNum = undefined
@@ -59,6 +64,8 @@ makeArgument operators premRange atomRange =
     let atoms = convertAtoms atomNum
     let conclusion = getConclusion operators atoms
     makePremise conclusion operators premNum atoms
+
+--------------------------------------------------------------------------------------------------------------end of making argument
 
 
 
