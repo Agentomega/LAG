@@ -38,9 +38,11 @@ getOperators =
 -------------------------------------------------------------------------------------------------------------end of prompting user
 
 -------------------------------------------------------------------------------------------------------------changing representations
-convertAtoms :: Int -> String
+convertAtoms :: Int -> [String]
 convertAtoms atomNum = 
-    take atomNum ['A'..'Z']
+    let posConclusion = (map (:[]) (take atomNum ['A'..'Z']))
+    in posConclusion ++ (map ('-':) posConclusion)
+
 
 
 convertOperators :: Int -> Char
@@ -53,12 +55,12 @@ convertOperators 3 = '→'
 
 --------------------------------------------------------------------------------------------------------------start of making argument
 
-getConclusion :: String -> String -> IO String
+getConclusion :: String -> [String] -> IO String
 getConclusion operators atoms =
-   runRVar (choice [[atom1] ++ " " ++ [operator] ++ " " ++ [atom2] | atom1 <- atoms, atom2 <- atoms, operator <- operators]) StdRandom
+   runRVar (choice [atom1 ++ " " ++ [operator] ++ " " ++ atom2| atom1 <- atoms, atom2 <- atoms, operator <- operators, atom1 /= atom2]) StdRandom
 
 
-makePremise :: IO String -> String -> Int -> String -> IO String
+makePremise :: IO String -> String -> Int -> [String] -> IO String
 makePremise = undefined
 
 
