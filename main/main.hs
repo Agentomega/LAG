@@ -40,8 +40,8 @@ getOperators =
 -------------------------------------------------------------------------------------------------------------changing representations
 convertAtoms :: Int -> [String]
 convertAtoms atomNum = 
-    let posConclusion = (map (:[]) (take atomNum ['A'..'Z']))
-    in posConclusion ++ (map ('-':) posConclusion)
+    let posConclusion = map (:[]) (take atomNum ['A'..'Z'])
+    in posConclusion ++ map ('-':) posConclusion
 
 
 
@@ -54,11 +54,13 @@ convertOperators 3 = '→'
 --------------------------------------------------------------------------------------------------------------end of changing representations
 
 --------------------------------------------------------------------------------------------------------------start of making argument
+checkAtoms :: String -> String -> Bool
+checkAtoms atom1 atom2 = 
+   not (atom1 /= "$" && atom2 /= "$") || (atom1 /= atom2)
 
 getConclusion :: String -> [String] -> IO String
 getConclusion operators atoms =
-   runRVar (choice [atom1 ++ " " ++ [operator] ++ " " ++ atom2| atom1 <- atoms, atom2 <- atoms, operator <- operators, atom1 /= atom2]) StdRandom
-
+   runRVar (choice [atom1 ++ " " ++ [operator] ++ " " ++ atom2 | atom1 <- atoms, atom2 <- atoms, operator <- operators,checkAtoms atom1 atom2]) StdRandom
 
 makePremise :: IO String -> String -> Int -> [String] -> IO String
 makePremise = undefined
@@ -69,13 +71,11 @@ makeArgument operators premRange atomRange =
    do
     premNum <- randomRIO premRange
     atomNum <- randomRIO atomRange
-    let atoms = convertAtoms atomNum
+    let atoms = convertAtoms atomNum ++ ["$"]
     let conclusion = getConclusion operators atoms
     makePremise conclusion operators premNum atoms
 
 --------------------------------------------------------------------------------------------------------------end of making argument
-
-
 
 
 main :: IO()
