@@ -1,6 +1,8 @@
 {-# LANGUAGE UnicodeSyntax #-}
 import System.Random(randomRIO)
-import Data.Random.Extras(safeChoice)
+import Data.Random.Extras(choice)
+import Data.Random.RVar(runRVar)
+import Data.Random
 import Data.Char (digitToInt)
 
 ----------------------------------------------------------------------------------------------------prompting user
@@ -46,17 +48,17 @@ convertOperators 1 = '∧'
 convertOperators 2 = '∨'
 convertOperators 3 = '→'
 
+
 --------------------------------------------------------------------------------------------------------------end of changing representations
 
 --------------------------------------------------------------------------------------------------------------start of making argument
 
-getConclusion :: String -> String -> [String]
+getConclusion :: String -> String -> IO String
 getConclusion operators atoms =
-    [[atom1] ++ " " ++ [operator] ++ " " ++ [atom2] | atom1 <- atoms, atom2 <- atoms, operator <- operators]
+   runRVar (choice [[atom1] ++ " " ++ [operator] ++ " " ++ [atom2] | atom1 <- atoms, atom2 <- atoms, operator <- operators]) StdRandom
 
 
-
-makePremise :: [String] -> String -> Int -> String -> IO String
+makePremise :: IO String -> String -> Int -> String -> IO String
 makePremise = undefined
 
 
