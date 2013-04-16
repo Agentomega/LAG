@@ -1,5 +1,6 @@
 {-# LANGUAGE UnicodeSyntax #-}
 import System.Random(randomRIO)
+import Data.Random.Extras(safeChoice)
 import Data.Char (digitToInt)
 
 ----------------------------------------------------------------------------------------------------prompting user
@@ -40,23 +41,26 @@ convertAtoms atomNum =
     take atomNum ['A'..'Z']
 
 
-convertOperators :: Int -> String
-convertOperators 1 = "∧"
-convertOperators 2 = "∨"
-convertOperators 3 = "→"
+convertOperators :: Int -> Char
+convertOperators 1 = '∧'
+convertOperators 2 = '∨'
+convertOperators 3 = '→'
+
 --------------------------------------------------------------------------------------------------------------end of changing representations
 
 --------------------------------------------------------------------------------------------------------------start of making argument
 
-getConclusion :: [String] -> String -> String
-getConclusion operators atomNum = undefined
+getConclusion :: String -> String -> [String]
+getConclusion operators atoms =
+    [[atom1] ++ " " ++ [operator] ++ " " ++ [atom2] | atom1 <- atoms, atom2 <- atoms, operator <- operators]
 
 
-makePremise :: String -> [String] -> Int -> String -> IO String
+
+makePremise :: [String] -> String -> Int -> String -> IO String
 makePremise = undefined
 
 
-makeArgument :: [String] -> (Int,Int) -> (Int,Int) -> IO String
+makeArgument :: String -> (Int,Int) -> (Int,Int) -> IO String
 makeArgument operators premRange atomRange =
    do
     premNum <- randomRIO premRange
