@@ -80,7 +80,7 @@ expandDol conclusion operators atoms = do
 
 getConclusion :: String -> [String] -> IO String
 getConclusion operators atoms = do
-   conclusion <- runRVar (choice ["(" ++ atom1 ++ " " ++ [operator] ++ " " ++ atom2 ++ ")"| atom1 <- atoms, atom2 <- atoms, operator <- operators, checkAtoms atom1 atom2]) StdRandom
+   conclusion <- runRVar (choice ["(" ++ atom1 ++ " " ++ [operator] ++ " " ++ atom2 ++ ")" | atom1 <- atoms, atom2 <- atoms, operator <- operators, checkAtoms atom1 atom2]) StdRandom
    if '$' `elem` conclusion then expandDol conclusion operators atoms
     else return conclusion
 
@@ -94,8 +94,8 @@ makeArgument operators premRange atomRange =
    do
     premNum <- randomRIO premRange
     atomNum <- randomRIO atomRange
-    let atoms = convertAtoms atomNum ++ ["$"]
-    let conclusion = getConclusion operators atoms
+    let atoms = convertAtoms atomNum
+    let conclusion = getConclusion operators (atoms ++ ["$"])
     makePremise conclusion operators premNum atoms
 
 --------------------------------------------------------------------------------------------------------------end of making argument
