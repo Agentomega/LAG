@@ -18,6 +18,8 @@ import Text.Parsec.Combinator(sepBy1,between,many1)
 import Data.Char (digitToInt)
 import Data.List(elemIndices, splitAt )
 
+data Tree = Leaf String | Node [Tree]
+
 ----------------------------------------------------------------------------------------------------prompting user
 getArguments :: IO Int
 getArguments =
@@ -95,18 +97,32 @@ getConclusion operators atoms = do
 ----------------------------------------------------------------------------end conclusion
 
 ----------------------------------------------------------------------------start premise
-data Expr = List [Expr] | Term String
 
-expr :: Parsec String () Expr
-expr = recurse <|> terminal
-      where terminal = Term <$> many1 letter
-            recurse  = List <$> (between `on` char) '(' ')' (expr `sepBy1` char ' ')
-
-collect r@(List ts) = (r :) $ ts >>= collect
-collect _ = []
+---------------------------------Start Parse
+parseTree :: Parser Tree
+parseTree = node <|> leaf
+  where
+    node = Node <$> between (char '(') (char ')') (many parseTree)
+    leaf = Leaf <$> many1 (noneOf "()")
 
 
+nodes :: Tree -> [Tree]
+nodes (Leaf _) = []
+nodes t@(Node ts) = t : concatMap nodes ts
+
+instance Show Tree where
+  showsPrec d (Leaf x) = showString x
+  showsPrec d (Node xs) = showString "(" . showList xs . showString ")"
+    where
+      showList [] = id
+      showList (x:xs) = shows x . showList xs
+
+parseGroups :: Parser [String]
+parseGroups = map show . nodes <$> parseTree
+
+-----------------------------------end Parse
 makePremise :: IO String -> String -> Int -> [String] -> IO String
+
 makePremise conclusion operators premNum atoms = undefined
 
 
