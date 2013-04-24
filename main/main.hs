@@ -8,6 +8,13 @@ import System.Random(randomRIO)
 import Data.Random.Extras(choice)
 import Data.Random.RVar(runRVar)
 import Data.Random
+import Data.Function
+import Text.Parsec.Prim
+import Text.Parsec.String
+import Text.Parsec.Char
+import Control.Applicative((<$>))
+import Text.Parsec.Token(symbol)
+import Text.Parsec.Combinator(sepBy1,between,many1)
 import Data.Char (digitToInt)
 import Data.List(elemIndices, splitAt )
 
@@ -63,6 +70,8 @@ convertOperators 3 = '→'
 --------------------------------------------------------------------------------------------------------------end of changing representations
 
 --------------------------------------------------------------------------------------------------------------start of making argument
+
+----------------------------------------------------------------------------conclusion
 checkAtoms :: String -> String -> Bool
 checkAtoms atom1 atom2 = 
    not (atom1 /= "$" && atom2 /= "$") || (atom1 /= atom2)
@@ -77,17 +86,32 @@ expandDol conclusion operators atoms = do
   where replacement = elemIndices '$' conclusion
 
 
-
 getConclusion :: String -> [String] -> IO String
 getConclusion operators atoms = do
    conclusion <- runRVar (choice ["(" ++ atom1 ++ " " ++ [operator] ++ " " ++ atom2 ++ ")" | atom1 <- atoms, atom2 <- atoms, operator <- operators, checkAtoms atom1 atom2]) StdRandom
    if '$' `elem` conclusion then expandDol conclusion operators atoms
     else return conclusion
 
+----------------------------------------------------------------------------end conclusion
+
+----------------------------------------------------------------------------start premise
+data Expr = List [Expr] | Term String
+
+expr :: Parsec String () Expr
+expr = recurse <|> terminal
+      where terminal = Term <$> many1 letter
+            recurse  = List <$> (between `on` char) '(' ')' (expr `sepBy1` char ' ')
+
+collect r@(List ts) = (r :) $ ts >>= collect
+collect _ = []
+
 
 makePremise :: IO String -> String -> Int -> [String] -> IO String
-makePremise = undefined
+makePremise conclusion operators premNum atoms = undefined
 
+
+
+----------------------------------------------------------------------------end premise
 
 makeArgument :: String -> (Int,Int) -> (Int,Int) -> IO String
 makeArgument operators premRange atomRange =
