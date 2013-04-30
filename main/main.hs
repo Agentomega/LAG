@@ -101,26 +101,6 @@ getConclusion operators atoms = do
 ----------------------------------------------------------------------------start premise
 
 ---------------------------------Start Parse
-parseTree :: Parser Tree
-parseTree = node <|> leaf
-  where
-    node = Node <$> between (char '(') (char ')') (many parseTree)
-    leaf = Leaf <$> many1 (noneOf "()")
-
-
-nodes :: Tree -> [Tree]
-nodes (Leaf _) = []
-nodes t@(Node ts) = t : concatMap nodes ts
-
-instance Show Tree where
-  showsPrec d (Leaf x) = showString x
-  showsPrec d (Node xs) = showString "(" . showList xs . showString ")"
-    where
-      showList [] = id
-      showList (x:xs) = shows x . showList xs
-
-parseGroups :: Parser [String]
-parseGroups = map show . nodes <$> parseTree
 
 tuple3 :: [a] -> (a,a,a)
 tuple3 [x,y,z] = (x,y,z)
