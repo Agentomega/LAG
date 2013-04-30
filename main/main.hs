@@ -17,7 +17,8 @@ import Text.Parsec.Token(symbol)
 import Text.Parsec.Combinator(sepBy1,between,many1)
 import Data.Char (digitToInt)
 import Data.List(elemIndices, splitAt )
-import Text.Regex.Base
+import Text.Regex.Posix
+import Data.Tuple.Utils
 
 data Tree = Leaf String | Node [Tree]
 
@@ -124,15 +125,16 @@ parseGroups = map show . nodes <$> parseTree
 tuple3 :: [a] -> (a,a,a)
 tuple3 [x,y,z] = (x,y,z)
 
-listWalk :: [String] -> [(String, String, String)]
-listWalk parseList
-  | null parseList = []
-  | not null parselist = let tripleBase = take 4 parseList (drop head tripleBase)
-    tuple3 tripleBase : listWalk (drop 4 parseList)
+parseLevel :: String -> (String, String, String)
+parseLevel statement =
+  tuple3 (drop 1 (head (statement =~ "[(]([(].*[)]|-?[A-Z]) (.) ([(].*[)]|-?[A-Z])[)]" :: [[String]])))
 
-parseTriples :: String -> [(String, String, String)]
-parseTriples statement = 
-  listWalk statement =~ "[(]([(].*[)]|-?[A-Z]) (.) ([(].*[)]|-?[A-Z])[)]" [String]
+extractTriples :: String -> [(String, String, String)]
+extractTriples statement
+  | length statement < 3 = []
+  | otherwise = (parsedTuple : []) ++ (extractTriples (fst3 parsedTuple) ++ (extractTriples (thd3 parsedTuple))
+  where parsedTuple = parseLevel statement
+
 
 -----------------------------------end Parse
 makePremise :: IO String -> String -> Int -> [String] -> IO String
