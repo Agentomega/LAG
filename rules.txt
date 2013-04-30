@@ -1,0 +1,24 @@
+Rules of Equivalence Used:
+
+Double Negation
+DeMorgan
+Distribution
+Absorption
+Reduction
+Adjacency
+Implication
+Contraposition
+Exportation
+Conditional Reduction
+
+Rules of Inference:
+
+Modus Ponens
+Modus Tollens
+Simplification
+Disjunction Introduction
+Disjunction Elimination
+Disjunctive Syllogism
+Constructive Dilemma
+Destructive Dilemma
+Absorption
