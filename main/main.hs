@@ -17,6 +17,7 @@ import Text.Parsec.Token(symbol)
 import Text.Parsec.Combinator(sepBy1,between,many1)
 import Data.Char (digitToInt)
 import Data.List(elemIndices, splitAt )
+import Text.Regex.Base
 
 data Tree = Leaf String | Node [Tree]
 
@@ -120,9 +121,21 @@ instance Show Tree where
 parseGroups :: Parser [String]
 parseGroups = map show . nodes <$> parseTree
 
+tuple3 :: [a] -> (a,a,a)
+tuple3 [x,y,z] = (x,y,z)
+
+listWalk :: [String] -> [(String, String, String)]
+listWalk parseList
+  | null parseList = []
+  | not null parselist = let tripleBase = take 4 parseList (drop head tripleBase)
+    tuple3 tripleBase : listWalk (drop 4 parseList)
+
+parseTriples :: String -> [(String, String, String)]
+parseTriples statement = 
+  listWalk statement =~ "[(]([(].*[)]|-?[A-Z]) (.) ([(].*[)]|-?[A-Z])[)]" [String]
+
 -----------------------------------end Parse
 makePremise :: IO String -> String -> Int -> [String] -> IO String
-
 makePremise conclusion operators premNum atoms = undefined
 
 
