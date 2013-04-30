@@ -118,6 +118,28 @@ extractTriples statement
 
 
 -----------------------------------end Parse
+
+reWrite :: String -> Int -> String
+reWrite = undefined
+
+
+split :: [(String,String,String)] -> IOArray Int String -> IOArray Int String
+split (x,y,z) beforeSplit = undefined
+{-
+ let statement = x ++ y ++ z
+ randomRIO(0,IOarray leng)
+-}
+
+
+makePremise :: IO String -> String -> Int -> [String] -> IO String
+makePremise conclusion operators premNum atoms = undefined
+{-
+let pool = joesFunc
+beforeSplit <- newArray (1,premNum) "*" :: IO (IOArray Int String)
+afterSplit <- split pool beforeSplit
+splt pool beforeSplit
+-}
+
 makePremise :: IO String -> String -> Int -> [String] -> IO String
 makePremise conclusion operators premNum atoms = undefined
 
