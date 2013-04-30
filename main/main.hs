@@ -131,9 +131,10 @@ parseLevel statement =
 
 extractTriples :: String -> [(String, String, String)]
 extractTriples statement
-  | length statement < 3 = []
-  | otherwise = (parsedTuple : []) ++ (extractTriples (fst3 parsedTuple) ++ (extractTriples (thd3 parsedTuple))
-  where parsedTuple = parseLevel statement
+ | length statement < 3 = []
+ | otherwise = (parsedTuple : []) ++ (extractTriples (fst3 parsedTuple) ++ (extractTriples (thd3 parsedTuple)))
+ where parsedTuple = parseLevel statement
+
 
 
 -----------------------------------end Parse
