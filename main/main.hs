@@ -77,8 +77,7 @@ getOperators =
 -------------------------------------------------------------------------------------------------------------changing representations
 convertAtoms :: Int -> [String]
 convertAtoms atomNum = 
-    let posConclusion = map (:[]) (take atomNum ['A'..'Z'])
-    in posConclusion ++ map ('-':) posConclusion
+    map (:[]) (take atomNum ['A'..'Z'])
 
 
 
@@ -109,7 +108,7 @@ expandDol conclusion operators atoms = do
 
 getConclusion :: String -> [String] -> IO String
 getConclusion operators atoms = do
-   conclusion <- runRVar (choice ["(" ++ atom1 ++ " " ++ [operator] ++ " " ++ atom2 ++ ")" | atom1 <- atoms, atom2 <- atoms, operator <- operators, checkAtoms atom1 atom2]) StdRandom
+   conclusion <- runRVar (choice [ if operator == '-' then "-" ++ atom1 else "(" ++ atom1 ++ " " ++ [operator] ++ " " ++ atom2 ++ ")" | atom1 <- atoms, atom2 <- atoms, operator <- operators, checkAtoms atom1 atom2]) StdRandom
    if '$' `elem` conclusion then expandDol conclusion operators atoms
     else return conclusion
 
@@ -124,12 +123,12 @@ tuple3 [x,y,z] = (x,y,z)
 
 parseLevel :: String -> (String, String, String)
 parseLevel statement =
-  tuple3 (drop 1 (head (statement =~ "[(](-*[(]?.*[)]?) (.) (-*[(]?.*[)]?[)]|()(-)(-*[(]?.+[)]?)" :: [[String]])))
+  tuple3 (drop 1 (head (statement =~ "[(]([(].*[)]|-?[A-Z]) (.) ([(].*[)]|-?[A-Z])[)]" :: [[String]])))
 
 extractTriples :: String -> [(String, String, String)]
 extractTriples statement
  | length statement < 2 = []
- | otherwise = (parsedTuple : []) ++ (extractTriples (fst3 parsedTuple) ++ (extractTriples (thd3 parsedTuple)))
+ | otherwise = parsedTuple : (extractTriples (fst3 parsedTuple) ++ extractTriples (thd3 parsedTuple))
  where parsedTuple = parseLevel statement
 
 
@@ -140,8 +139,8 @@ reWrite :: String -> Int -> String
 reWrite = undefined
 
 
-split :: [(String,String,String)] -> IOArray Int String -> IOArray Int String
-split (x,y,z) beforeSplit = undefined
+--split :: [(String,String,String)] -> IOArray Int String -> IOArray Int String
+--split (x,y,z) beforeSplit = undefined
 {-
  let statement = x ++ y ++ z
  randomRIO(0,IOarray leng)
@@ -159,7 +158,7 @@ splt pool beforeSplit
 
 deMorganTransform :: (String, String, String) -> (String, String, String)
 deMorganTransform statement
-  | (snd3 statement) == "-" = if (snd3 statement2) == "a" then ("-"++(fst3 statement2), "o", "-"(thd3 statement2)) else ("-"++(fst3 statement2), "a", "-"(thd3 statement2))
+  | (snd3 statement) == "-" = if (snd3 statement2) == "a" then ("-"++(fst3 statement2), "o", "-"++(thd3 statement2)) else ("-"++(fst3 statement2), "a", "-"++(thd3 statement2))
   | otherwise = if (snd3 statement) == "a" then ("", "-", "(-"++(fst3 statement)++" o -"++(thd3 statement)++")") else ("", "-", "(-"++(fst3 statement)++" a -"++(thd3 statement)++")")
   where statement2 = (head (extractTriples (thd3 statement)))
 
@@ -172,8 +171,8 @@ disjunctionIntroTransform statement
 
 possibleTransforms :: (String, String, String) -> [(String, Int)] -> [Int]
 possibleTransforms statement patternRules
-  | length patternRules == 0 = []
-  | (((fst3 statement) ++ " " ++ (snd3 statement) ++ " " ++ (thd3 statement)) =~ (fst (head patternRules)) :: Bool) || (((snd3 statement) == "-") && (snd3 statement) ++ (thd3 statement) =~ (fst (head patternRules)) :: Bool) = (snd (head patternRules)) : (possibleTransforms statement (drop 1 patternRules))
+  | null patternRules = []
+  | ((((fst3 statement) ++ " " ++ (snd3 statement) ++ " " ++ (thd3 statement)) =~ (fst (head patternRules)) :: Bool) || ((snd3 statement) == "-") && ((snd3 statement) ++ (thd3 statement)) =~ (fst (head patternRules)) :: Bool) = (snd (head patternRules)) : (possibleTransforms statement (drop 1 patternRules))
   | otherwise = [] ++ (possibleTransforms statement (drop 1 patternRules))
 
 ----------------------------------------------------------------------------end premise
