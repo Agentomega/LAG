@@ -20,26 +20,24 @@ import Data.List(elemIndices, splitAt )
 import Text.Regex.Posix
 import Data.Tuple.Utils
 
-data Tree = Leaf String | Node [Tree]
-
-equivalenceMapping = [ ("-?[(]?.+[)]? [ao] -?[(]?.+[)]?|-[(].+ [ao] .+[)]", 1)
-                      , ("-?[(]?.+[)]? a [(].+ o .+[)]|[(].+ o .+[)] a -?[(]?.+[)]?|-?[(]?.+[)]? o [(].+ a .+[)]|[(].+ a .+[)] o -?[(]?.+[)]?", 2)
-                      , (".+", 3) 
-                      , ("-?[(]?.+[)]? [ao] -?[(]?.+[)]?", 4)
-                      , (".+", 5)
-                      , ("-?[(]?[(]?.+[)]? c [(]?.+[)]?[)]?|-?[(]?.+[)]? [ao] -?[(]?.+[)]?", 6)
-                      , ("-?[(].+[)] c -?[(]?.+[)]?", 7)
-                      , ("-?[(]?.+[)]? c [(]-?[(]?.+[)]? c -?[(]?.+[)]?[)]", 8)
-                      , (".+", 9) ]
+equivalenceMapping = [ ("-*[(]?.+[)]? [ao] -*[(]?.+[)]?|-[(].+ [ao] .+[)]", 1)
+                     , ("-*[(]?.+[)]? a [(].+ o .+[)]|[(].+ o .+[)] a -*[(]?.+[)]?|-*[(]?.+[)]? o [(].+ a .+[)]|[(].+ a .+[)] o -*[(]?.+[)]?", 2)
+                     , (".+", 3) 
+                     , ("-*[(]?.+[)]? [ao] -*[(]?.+[)]?", 4)
+                     , (".+", 5)
+                     , ("-*[(]?[(]?.+[)]? c [(]?.+[)]?[)]?|-*[(]?.+[)]? [ao] -*[(]?.+[)]?", 6)
+                     , ("-*[(].+[)] c -*[(]?.+[)]?", 7)
+                     , ("-*[(]?.+[)]? c [(]-*[(]?.+[)]? c -*[(]?.+[)]?[)]", 8)
+                     , (".+", 9) ]
 
 inferenceMapping = [ (".+", 1)
                    , (".+", 2)
                    , (".+", 3)
-                   , ("-?[(]?.+[)]? o -?[(]?.+[)]?", 4)
+                   , ("-*[(]?.+[)]? o -*[(]?.+[)]?", 4)
                    , (".+", 5)
                    , (".+", 6)
-                   , ("-?[(]?.+[)]? o -?[(]?.+[)]?", 7)
-                   , ("-?[(]?.+[)]? o -?[(]?.+[)]?", 8) ]
+                   , ("-*[(]?.+[)]? o -*[(]?.+[)]?", 7)
+                   , ("-*[(]?.+[)]? o -*[(]?.+[)]?", 8) ]
 
 ----------------------------------------------------------------------------------------------------prompting user
 getArguments :: IO Int
@@ -126,11 +124,11 @@ tuple3 [x,y,z] = (x,y,z)
 
 parseLevel :: String -> (String, String, String)
 parseLevel statement =
-  tuple3 (drop 1 (head (statement =~ "[(]([(].*[)]|-?[A-Z]) (.) ([(].*[)]|-?[A-Z])[)]" :: [[String]])))
+  tuple3 (drop 1 (head (statement =~ "[(](-*[(]?.*[)]?) (.) (-*[(]?.*[)]?[)]|()(-)(-*[(]?.+[)]?)" :: [[String]])))
 
 extractTriples :: String -> [(String, String, String)]
 extractTriples statement
- | length statement < 3 = []
+ | length statement < 2 = []
  | otherwise = (parsedTuple : []) ++ (extractTriples (fst3 parsedTuple) ++ (extractTriples (thd3 parsedTuple)))
  where parsedTuple = parseLevel statement
 
@@ -159,10 +157,23 @@ afterSplit <- split pool beforeSplit
 splt pool beforeSplit
 -}
 
+deMorganTransform :: (String, String, String) -> (String, String, String)
+deMorganTransform statement
+  | (snd3 statement) == "-" = if (snd3 statement2) == "a" then ("-"++(fst3 statement2), "o", "-"(thd3 statement2)) else ("-"++(fst3 statement2), "a", "-"(thd3 statement2))
+  | otherwise = if (snd3 statement) == "a" then ("", "-", "(-"++(fst3 statement)++" o -"++(thd3 statement)++")") else ("", "-", "(-"++(fst3 statement)++" a -"++(thd3 statement)++")")
+  where statement2 = (head (extractTriples (thd3 statement)))
+
+
+
+disjunctionIntroTransform :: (String, String, String) -> [(String, String, String)]
+disjunctionIntroTransform statement
+  | length (fst3 statement) > length (thd3 statement) = (head (extractTriples (fst3 statement))) : []
+  | otherwise = (head (extractTriples (snd3 statement))) : []
+
 possibleTransforms :: (String, String, String) -> [(String, Int)] -> [Int]
 possibleTransforms statement patternRules
   | length patternRules == 0 = []
-  | (((fst3 statement) ++ " " ++ (snd3 statement) ++ " " ++ (thd3 statement)) =~ (fst (head patternRules)) :: Bool) = (snd (head patternRules)) : (possibleTransforms statement (drop 1 patternRules))
+  | (((fst3 statement) ++ " " ++ (snd3 statement) ++ " " ++ (thd3 statement)) =~ (fst (head patternRules)) :: Bool) || (((snd3 statement) == "-") && (snd3 statement) ++ (thd3 statement) =~ (fst (head patternRules)) :: Bool) = (snd (head patternRules)) : (possibleTransforms statement (drop 1 patternRules))
   | otherwise = [] ++ (possibleTransforms statement (drop 1 patternRules))
 
 ----------------------------------------------------------------------------end premise
@@ -187,7 +198,7 @@ main =
     validity <- getValidity
     putStrLn "Enter the range of the number of premises to each argument"
     premRange <- getRange
-    putStrLn "Enter the range of the number of atomic statments per premises"
+    putStrLn "Enter the range of the number of atomic statments per argument"
     atomRange <- getRange
     dummyOperators <- getOperators
     let operators = map convertOperators dummyOperators
