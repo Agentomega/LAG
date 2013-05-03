@@ -22,6 +22,25 @@ import Data.Tuple.Utils
 
 data Tree = Leaf String | Node [Tree]
 
+let equivalenceMapping = [ ("-?[(]?.+[)]? [ao] -?[(]?.+[)]?|-[(].+ [ao] .+[)]", 1)
+                         , ("-?[(]?.+[)]? a [(].+ o .+[)]|[(].+ o .+[)] a -?[(]?.+[)]?|-?[(]?.+[)]? o [(].+ a .+[)]|[(].+ a .+[)] o -?[(]?.+[)]?", 2)
+                         , (".+", 3) 
+                         , ("-?[(]?.+[)]? [ao] -?[(]?.+[)]?", 4)
+                         , (".+", 5)
+                         , ("-?[(]?[(]?.+[)]? c [(]?.+[)]?[)]?|-?[(]?.+[)]? [ao] -?[(]?.+[)]?", 6)
+                         , ("-?[(].+[)] c -?[(]?.+[)]?", 7)
+                         , ("-?[(]?.+[)]? c [(]-?[(]?.+[)]? c -?[(]?.+[)]?[)]", 8)
+                         , (".+", 9) ]
+
+let inferenceMapping = [ (".+", 1)
+                       , (".+", 2)
+                       , (".+", 3)
+                       , ("-?[(]?.+[)]? o -?[(]?.+[)]?", 4)
+                       , (".+", 5)
+                       , (".+", 6)
+                       , ("-?[(]?.+[)]? o -?[(]?.+[)]?", 7)
+                       , ("-?[(]?.+[)]? o -?[(]?.+[)]?", 8) ]
+
 ----------------------------------------------------------------------------------------------------prompting user
 getArguments :: IO Int
 getArguments =
@@ -140,11 +159,11 @@ afterSplit <- split pool beforeSplit
 splt pool beforeSplit
 -}
 
-possibleTransforms :: (String, String, String) -> [Int]
-possibleTransforms statement
-  | (snd3 statement) == "a" = 
-  | (snd3 statement) == "o" = 
-  | (snd3 statement) == "c" = 
+possibleTransforms :: (String, String, String) -> [(String, Int)] -> [Int]
+possibleTransforms statement patternRules
+  | length patternRules == 0 = []
+  | (((fst3 statement) ++ " " ++ (snd3 statement) ++ " " ++ (thd3 statement)) =~ (fst (head patternRules)) :: Bool) = (snd (head patternRules)) : (possibleTransforms statement (drop 1 patternRules))
+  | otherwise = [] ++ (possibleTransforms statement (drop 1 patternRules))
 
 ----------------------------------------------------------------------------end premise
 
