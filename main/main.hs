@@ -140,14 +140,11 @@ afterSplit <- split pool beforeSplit
 splt pool beforeSplit
 -}
 
-makePremise :: IO String -> String -> Int -> [String] -> IO String
-makePremise conclusion operators premNum atoms = undefined
-
-possibleTransforms :: (String, String, String) -> [(String, Int)] -> [Int]
-possibleTransforms statement patternRules
-  | length patternRules == 0 = []
-  | (((fst3 statement) ++ " " ++ (snd3 statement) ++ " " ++ (thd3 statement)) =~ (fst (head patternRules)) :: Bool) = (snd (head patternRules)) : (possibleTransforms statement (drop 1 patternRules))
-  | otherwise = [] ++ (possibleTransforms statement (drop 1 patternRules))
+possibleTransforms :: (String, String, String) -> [Int]
+possibleTransforms statement
+  | (snd3 statement) == "a" = 
+  | (snd3 statement) == "o" = 
+  | (snd3 statement) == "c" = 
 
 ----------------------------------------------------------------------------end premise
 
