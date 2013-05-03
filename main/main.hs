@@ -123,7 +123,7 @@ tuple3 [x,y,z] = (x,y,z)
 
 parseLevel :: String -> (String, String, String)
 parseLevel statement =
-  tuple3 (drop 1 (head (statement =~ "[(](-*[(].*[)]|-*[A-Z]) (.) (-*[(].*[)]|-*[A-Z])[)]" :: [[String]])))
+  tuple3 (drop 1 (head (statement =~ "^[(](-*[(].*[)]|-*[A-Z]) (.) (-*[(].*[)]|-*[A-Z])[)]" :: [[String]])))
 
 extractTriples :: String -> [(String, String, String)]
 extractTriples statement
