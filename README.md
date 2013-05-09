@@ -4,10 +4,12 @@ LAG
 Logical Argument Generator
 
 Table of Contents:
-
 1 Installation
+
 2 How to Run
+
 3 Known Bugs
+
 4 Future Work
 
 1.  Installation
