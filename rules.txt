@@ -1,4 +1,4 @@
-Rules of Equivalence Used:
+Rules of Equivalence to Use:
 
 Double Negation
 DeMorgan
@@ -11,7 +11,7 @@ Contraposition
 Exportation
 Conditional Reduction
 
-Rules of Inference:
+Rules of Inference to Use:
 
 Modus Ponens
 Modus Tollens
@@ -21,4 +21,55 @@ Disjunction Elimination
 Disjunctive Syllogism
 Constructive Dilemma
 Destructive Dilemma
-Absorption
+
+Regular Expressions Overview:
+
+Regular expressions are a form of pattern matching that allow us
+to check if a pattern is within a string, and extract groups based upon them.
+
+"." is a wildcard and matches any character.
+
+"*" matches 0 to infinity of the preceeding character.  It is greedy.
+Therefore, ".*" will match the entire string.
+
+"+" matches 1 to infinity of the preceeding character.  It is also greedy.
+
+"?" means that the preceeding expression may or may not be in the match.
+
+"|" is essentially the same as or - it applies some number of expressions separated
+by a generalized disjunction.
+
+Any statement surrounded by parentheses in a regular expression will save
+whatever the middle part matches as a subgroup of the matched sequence.
+For instance, matching "abbbbbbc" with ".(b+)." would return the groups:
+"abbbbbbc" and "bbbbbb".
+
+Any character(s) surrounded by square brackets ([]) becomes a literal. One may also match
+ranges of characters.  For example:
+"[?]" matches the literal '?' without meaning the conditional as expressed above.
+"[A-Za-z]" matches any alphabetical character.
+
+
+
+List of expressions and their corresponding transform:
+
+Equivalences:
+DeMorgan - "-*[(]?.+[)]? [ao] -*[(]?.+[)]?|-[(].+ [ao] .+[)]"
+Distribution - "-*[(]?.+[)]? a [(].+ o .+[)]|[(].+ o .+[)] a -*[(]?.+[)]?|-*[(]?.+[)]? o [(].+ a .+[)]|[(].+ a .+[)] o -*[(]?.+[)]?"
+Absorption - ".+"
+Reduction - "-*[(]?.+[)]? [ao] -*[(]?.+[)]?"
+Adjacency - ".+"
+Implication - "-*[(]?[(]?.+[)]? c [(]?.+[)]?[)]?|-*[(]?.+[)]? [ao] -*[(]?.+[)]?"
+Contraposition - "-*[(].+[)] c -*[(]?.+[)]?"
+Exportation - "-*[(]?.+[)]? c [(]-*[(]?.+[)]? c -*[(]?.+[)]?[)]"
+Conditional Reduction - ".+"
+
+Inferences:
+Modus Ponens - ".+"
+Modus Tollens - ".+"
+Simplification - ".+"
+Disjunction Introduction - "-*[(]?.+[)]? o -*[(]?.+[)]?"
+Disjunction Elimination - ".+"
+Disjunctive Syllogism - ".+"
+Constructive Dilemma - "-*[(]?.+[)]? o -*[(]?.+[)]?"
+Destructive Dilemma - "-*[(]?.+[)]? o -*[(]?.+[)]?"

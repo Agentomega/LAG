@@ -9,12 +9,7 @@ import Data.Random.Extras(choice)
 import Data.Random.RVar(runRVar)
 import Data.Random
 import Data.Function
-import Text.Parsec.Prim
-import Text.Parsec.String
-import Text.Parsec.Char
 import Control.Applicative((<$>))
-import Text.Parsec.Token(symbol)
-import Text.Parsec.Combinator(sepBy1,between,many1)
 import Data.Char (digitToInt)
 import Data.List(elemIndices, splitAt )
 import Text.Regex.Posix
@@ -123,7 +118,7 @@ tuple3 [x,y,z] = (x,y,z)
 
 parseLevel :: String -> (String, String, String)
 parseLevel statement =
-  tuple3 (drop 1 (head (statement =~ "^[(](-*[(].*[)]|-*[A-Z]) (.) (-*[(].*[)]|-*[A-Z])[)]" :: [[String]])))
+  tuple3 (drop 1 (head (statement =~ "(^)(-)(.*)" :: [[String]]) ++ head (statement =~ "^[(](-*[(].*[)]|-*[A-Z]) (.) (-*[(].*[)]|-*[A-Z])[)]" :: [[String]])))
 
 extractTriples :: String -> [(String, String, String)]
 extractTriples statement
@@ -139,22 +134,8 @@ reWrite :: String -> Int -> String
 reWrite = undefined
 
 
---split :: [(String,String,String)] -> IOArray Int String -> IOArray Int String
---split (x,y,z) beforeSplit = undefined
-{-
- let statement = x ++ y ++ z
- randomRIO(0,IOarray leng)
--}
-
-
 makePremise :: IO String -> String -> Int -> [String] -> IO String
 makePremise conclusion operators premNum atoms = undefined
-{-
-let pool = joesFunc
-beforeSplit <- newArray (1,premNum) "*" :: IO (IOArray Int String)
-afterSplit <- split pool beforeSplit
-splt pool beforeSplit
--}
 
 deMorganTransform :: (String, String, String) -> (String, String, String)
 deMorganTransform statement
